@@ -35,4 +35,3 @@ def get_image(index):
     im = ax.imshow(image, origin='lower', norm=norm, cmap='gray') # cmap='gray_r' gives a darker image
     fig.colorbar(im)
 
-get_image(1)
