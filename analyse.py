@@ -1,8 +1,9 @@
 # %%
 from load_data import *
+from background_threshold import *
 from source_detection import *
 
-threshold = 3500 # change this later
+threshold = getBackgroundThreshold()
 
 imageWithMask = getImageWithMask(originalImage, threshold)
 
