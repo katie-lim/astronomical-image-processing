@@ -1,18 +1,16 @@
 # %%
 from numba import jit
 import numpy as np
-import matplotlib.pyplot as plt
 from uncertainties import unumpy
-from matplotlib.patches import Circle
+
 from load_data import *
 
 
 
-def findBrightestSources(imageWithMask, N):
-    image = imageWithMask
+def findBrightestSources(image, N):
     height, width = image.shape
 
-    # Highest to lowest
+    # Pixels in order of brightest to dimmest
     pixelIndices = np.flip(np.argsort(image.filled(0), axis=None))
 
 
@@ -56,7 +54,6 @@ def findBrightestSources(imageWithMask, N):
 def findBrightestSourcesFast(image, mask, N):
     height, width = image.shape
 
-    # Highest to lowest
     # pixelIndices = np.flip(np.argsort(image.filled(0), axis=None))
     # numba doesn't support the filled function
     pixelIndices = np.flip(np.argsort(image.flatten()))
@@ -102,13 +99,6 @@ def findBrightestSourcesFast(image, mask, N):
 
 
 
-
-def plotCircles(imageWithMask, sourcePositions):
-    plotZScale(imageWithMask.data)
-
-    for (x, y) in sourcePositions:
-        circ = Circle((x, y), 75, fc="#00000000", ec="blue")
-        plt.gca().add_patch(circ)
 
 
 # %%

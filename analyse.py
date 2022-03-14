@@ -1,25 +1,31 @@
 # %%
 from load_data import *
+from plot_data import *
 from background_threshold import *
 from source_detection import *
 from photometry import *
 
+# Exclude the vertical line and artefacts (e.g. edge effects) from our analysis of the background
+cleanImage = getCleanImage()
 
-cleanImage = tidyImage(originalImage)
+# Calculate the background threshold
 threshold = getBackgroundThreshold(cleanImage).n
 
-imageWithMask = getImageWithMask(originalImage, threshold)
 
-imageWithMask = maskVerticalLine(imageWithMask, 1425, 1452, 3200, 3200)
-
-image = cropImage(imageWithMask, ymin=500, ymax=4500, xmax=2500)
+# Load in the image and remove bad sections so we can detect sources
+image = getImage()
+image = maskBackground(image, threshold)
+image = maskVerticalLine(image, 1425, 1452)
+image = cropImage(image, ymin=500, ymax=4500, xmax=2500)
 
 # %%
+# Detect sources
 sourcePositions = findBrightestSourcesFast(image.data, image.mask, 200)
 
 plotCircles(image, sourcePositions)
 
 # %%
+# Photometry
 apertureSums = [getApertureSum(image, *pos, 12, 24) for pos in sourcePositions]
 
 
