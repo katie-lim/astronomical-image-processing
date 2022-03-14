@@ -5,7 +5,8 @@ from source_detection import *
 from photometry import *
 
 
-threshold = getBackgroundThreshold()
+cleanImage = tidyImage(originalImage)
+threshold = getBackgroundThreshold(cleanImage).n
 
 imageWithMask = getImageWithMask(originalImage, threshold)
 
