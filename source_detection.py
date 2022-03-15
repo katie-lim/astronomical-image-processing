@@ -10,7 +10,6 @@ from load_data import *
 
 
 def findBrightestSources(image, N):
-    height, width = image.shape
 
     # Pixels in order of brightest to dimmest
     pixelIndices = np.flip(np.argsort(image.filled(0), axis=None))
@@ -34,71 +33,19 @@ def findBrightestSources(image, N):
         # Store the x, y of this source
         sourcePositions.append((x, y))
 
-        fitEllipseToSource(image, x, y)
 
-        # Mask the circular region surrounding the pixel
-        radius = 100
+        ellipse = fitEllipseToSource(image, x, y)
 
-        for dx in range(-radius, radius+1):
-            for dy in range(-radius, radius+1):
-                if (dx**2 + dy**2) <= radius**2:
-                    newx = x + dx
-                    newy = y + dy
 
-                    if (0 <= newx < width) and (0 <= newy < height):
-                        image[newy, newx] = np.ma.masked
+
+        # Mask the region contained within the ellipse
+        ellipsePixels = cv2.ellipse(np.zeros(image.shape), ellipse, (255,255,255), cv2.FILLED)
+
+        image.mask = np.logical_or(image.mask, ellipsePixels)
 
 
     return sourcePositions
 
-
-
-@jit(nopython=True)
-def findBrightestSourcesFast(image, mask, N):
-    height, width = image.shape
-
-    # pixelIndices = np.flip(np.argsort(image.filled(0), axis=None))
-    # numba doesn't support the filled function
-    pixelIndices = np.flip(np.argsort(image.flatten()))
-
-
-    sourcePositions = []
-
-
-    for index in pixelIndices:
-        if len(sourcePositions) >= N:
-            break
-
-        # y, x = np.unravel_index(index, image.shape)
-        # numba doesn't support the unravel_index function
-        # so do it manually
-        y = index // width
-        x = index % width
-
-
-        # Check whether this pixel is masked
-        if (mask[y, x] == True):
-            continue
-
-
-        # Store the x, y of this source
-        sourcePositions.append((x, y))
-
-
-        # Mask the circular region surrounding the pixel
-        radius = 100
-
-        for dx in range(-radius, radius+1):
-            for dy in range(-radius, radius+1):
-                if (dx**2 + dy**2) <= radius**2:
-                    newx = x + dx
-                    newy = y + dy
-
-                    if (0 <= newx < width) and (0 <= newy < height):
-                        mask[newy, newx] = True
-
-
-    return sourcePositions
 
 
 
@@ -117,6 +64,9 @@ def fitEllipseToSource(image, x, y):
     plt.ylim(y-boxSize, y+boxSize)
 
     plt.show()
+
+
+    return ellipse
 
 
 
@@ -152,6 +102,8 @@ def getPixelsWithinSource(image, x, y):
 def fitEllipseToCleanData(cleanData, x, y):
     # Find contours
     contours, hierarchy = cv2.findContours(cleanData, cv2.RETR_EXTERNAL,  cv2.CHAIN_APPROX_SIMPLE)
+
+    # cv2.RETR_EXTERNAL to find the outermost contour
 
 
     # plt.figure(dpi=400)
