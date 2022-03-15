@@ -6,20 +6,24 @@ from source_detection import *
 from photometry import *
 # %%
 # Exclude the vertical line and artefacts (e.g. edge effects) from our analysis of the background
-cleanImage = getCleanImage()
+cleanPixels = getCleanPixels()
 
 # Calculate the background threshold
-threshold = getBackgroundThreshold(cleanImage).n
+threshold = getBackgroundThreshold(cleanPixels).n
 # %%
 # Load in the image and remove bad sections so we can detect sources
 image = getImage()
 image = maskBackground(image, threshold)
 image = maskVerticalLine(image, 1410, 1470)
-image = cropImage(image, ymin=500, ymax=4500, xmax=2500)
+image = maskCircle(image, 1440, 3200, 300)
+image = cropImage(image, ymin=500, ymax=4400, xmin=100, xmax=2350)
+# %%
+
+plotZScale(image.filled(0))
 
 # %%
 # Detect sources
-sourceEllipses = findBrightestSources(image, 100)
+sourceEllipses = findBrightestSources(image, 200)
 # %%
 
 plotZScale(image.data)

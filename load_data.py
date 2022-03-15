@@ -43,5 +43,16 @@ def maskVerticalLine(image, xmin, xmax):
 
 
 
+def maskCircle(image, x, y, radius):
+
+    for dy in range(-radius, radius+1):
+        for dx in range(-radius, radius+1):
+            if (dx**2 + dy**2) < radius**2:
+                image[y + dy, x + dx] = np.ma.masked
+
+    return image
+
+
+
 def cropImage(image, xmin=0, xmax=None, ymin=0, ymax=None):
     return image[ymin:ymax, xmin:xmax]

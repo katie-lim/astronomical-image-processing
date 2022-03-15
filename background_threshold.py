@@ -7,12 +7,13 @@ from load_data import *
 
 
 
-def getCleanImage():
+def getCleanPixels():
     # Remove bad pixels
     # so they don't distort our analysis of the background
     image = getImage()
     image = maskVerticalLine(image, 1410, 1470)
-    image = cropImage(image, ymin=500, ymax=4500, xmax=2500)
+    image = maskCircle(image, 1440, 3200, 300)
+    image = cropImage(image, ymin=500, ymax=4400, xmin=100, xmax=2350)
 
 
     # Remove masked pixels from our analysis
