@@ -19,7 +19,7 @@ image = cropImage(image, ymin=500, ymax=4500, xmax=2500)
 
 # %%
 # Detect sources
-sourceEllipses = findBrightestSources(image, 10)
+sourceEllipses = findBrightestSources(image, 100)
 # %%
 
 plotZScale(image.data)

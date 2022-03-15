@@ -1,10 +1,11 @@
 # %%
 import numpy as np
 from load_data import *
+from plot_data import *
 from ellipses import *
 
 
-def getApertureSumEllipse(image, ellipse, delta):
+def getApertureSumEllipse(image, ellipse, delta, plot=False):
     """
     Returns the sum of pixel counts within the given ellipse.
 
@@ -13,6 +14,7 @@ def getApertureSumEllipse(image, ellipse, delta):
     image
     ellipse
     delta: The width of the annular reference aperture.
+    plot: Whether to show a plot of the source and reference apertures.
     """
 
     # Enlarge the ellipse to create an annular reference aperture
@@ -36,6 +38,22 @@ def getApertureSumEllipse(image, ellipse, delta):
 
     # Subtract contribution from background
     sourceCnt -= Nsource * (bgCnt / Nbg)
+
+
+    # Plot the result
+    if plot:
+        plotZScale(image.data, "gray")
+        plotEllipses([ellipse, widerEllipse])
+        x, y = ellipse[0]
+        plt.title("source at (%.2f, %.2f)" % (x, y))
+
+        # Zoom into this source
+        boxSize = 100
+        plt.xlim(x-boxSize, x+boxSize)
+        plt.ylim(y-boxSize, y+boxSize)
+
+        plt.show()
+
 
     return sourceCnt
 

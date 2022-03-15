@@ -31,14 +31,17 @@ def findBrightestSources(image, N):
 
 
         # Fit an ellipse to the source and store it
-        ellipse = fitEllipseToSource(image, x, y)
+        success, ellipse = fitEllipseToSource(image, x, y)
+
+        if not success:
+            continue
+
         sourceEllipses.append(ellipse)
+
 
 
         # Mask the region contained within the ellipse
         ellipsePixels = getEllipsePixels(image, ellipse)
-        print(ellipsePixels)
-
 
 
         image.mask = np.logical_or(image.mask, ellipsePixels)
@@ -52,22 +55,6 @@ def findBrightestSources(image, N):
 def fitEllipseToSource(image, x, y):
     cleanData = getPixelsWithinSource(image, x, y)
     ellipse = fitEllipseToCleanData(cleanData, x, y)
-
-    largerEllipse = enlargeEllipse(ellipse, 25)
-
-
-    plotZScale(image.data, "gray")
-    plotEllipse(ellipse)
-    plotEllipse(largerEllipse)
-    plt.title("source at (%d, %d)" % (x, y))
-
-    # Zoom into this source
-    boxSize = 100
-    plt.xlim(x-boxSize, x+boxSize)
-    plt.ylim(y-boxSize, y+boxSize)
-
-    plt.show()
-
 
     return ellipse
 
@@ -99,9 +86,10 @@ def getPixelsWithinSource(image, x, y):
 
 def fitEllipseToCleanData(cleanData, x, y):
     # Find contours
-    contours, hierarchy = cv2.findContours(cleanData, cv2.RETR_EXTERNAL,  cv2.CHAIN_APPROX_SIMPLE)
 
     # cv2.RETR_EXTERNAL to find the outermost contour
+
+    contours, hierarchy = cv2.findContours(cleanData, cv2.RETR_EXTERNAL,  cv2.CHAIN_APPROX_SIMPLE)
 
 
     # plt.figure(dpi=400)
@@ -115,9 +103,17 @@ def fitEllipseToCleanData(cleanData, x, y):
 
     # Fit an ellipse
     cnt = contours[0]
+
+    if len(cnt) < 5:
+        print("Need 5 points to fit an ellipse to the source at (%d, %d)." % (x, y))
+
+        # (success, ellipse)
+        return (False, None)
+
+
     ellipse = cv2.fitEllipse(cnt)
 
-
-    return ellipse
+    # (success, ellipse)
+    return (True, ellipse)
 
 # %%
