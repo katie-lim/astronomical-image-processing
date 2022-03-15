@@ -11,17 +11,16 @@ cleanImage = getCleanImage()
 # Calculate the background threshold
 threshold = getBackgroundThreshold(cleanImage).n
 
-
 # Load in the image and remove bad sections so we can detect sources
 image = getImage()
 image = maskBackground(image, threshold)
-image = maskVerticalLine(image, 1425, 1452)
+image = maskVerticalLine(image, 1410, 1470)
 image = cropImage(image, ymin=500, ymax=4500, xmax=2500)
 
 # %%
 # Detect sources
-sourcePositions = findBrightestSourcesFast(image.data, image.mask, 200)
-
+sourcePositions = findBrightestSources(image, 10)
+# %%
 plotCircles(image, sourcePositions)
 
 # %%

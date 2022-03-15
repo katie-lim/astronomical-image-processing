@@ -1,0 +1,8 @@
+opencv>=4.5.5
+scikit-image
+numba
+numpy
+scipy
+matplotlib
+uncertainties
+astropy

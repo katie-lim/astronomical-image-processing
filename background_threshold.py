@@ -11,7 +11,7 @@ def getCleanImage():
     # Remove bad pixels
     # so they don't distort our analysis of the background
     image = getImage()
-    image = maskVerticalLine(image, 1425, 1452)
+    image = maskVerticalLine(image, 1410, 1470)
     image = cropImage(image, ymin=500, ymax=4500, xmax=2500)
 
 

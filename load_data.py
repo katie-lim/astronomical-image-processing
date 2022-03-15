@@ -45,21 +45,3 @@ def maskVerticalLine(image, xmin, xmax):
 
 def cropImage(image, xmin=0, xmax=None, ymin=0, ymax=None):
     return image[ymin:ymax, xmin:xmax]
-
-
-
-def plotZScale(image):
-
-    norm = ImageNormalize(image, ZScaleInterval())
-
-    fig = plt.figure(figsize=(3, 8), dpi=400)
-    ax = fig.add_subplot(1, 1, 1)
-
-    im = ax.imshow(image, norm=norm, origin="lower", cmap="gray")
-    fig.colorbar(im)
-
-
-    height, width = image.shape
-    plt.xlim(0, width)
-    plt.ylim(0, height)
-
