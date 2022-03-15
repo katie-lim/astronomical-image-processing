@@ -1,42 +1,47 @@
+# %%
 import numpy as np
 from load_data import *
+from ellipses import *
 
 
-def getPixelSumWithinRadius(imageWithMask, x, y, radius):
-    image = imageWithMask.data
-    height, width = image.shape
+def getApertureSumEllipse(image, ellipse, delta):
+    """
+    Returns the sum of pixel counts within the given ellipse.
 
-    counts = 0
-    noOfPixels = 0
+    Params
+    -------
+    image
+    ellipse
+    delta: The width of the annular reference aperture.
+    """
 
-    for dx in range(-radius, radius+1):
-        for dy in range(-radius, radius+1):
-            if (dx**2 + dy**2) <= radius**2:
-                newx = x + dx
-                newy = y + dy
-
-                if (0 <= newx < width) and (0 <= newy < height):
-                    counts += image[newy, newx]
-                    noOfPixels += 1
-
-    return counts, noOfPixels
+    # Enlarge the ellipse to create an annular reference aperture
+    widerEllipse = enlargeEllipse(ellipse, delta)
 
 
-
-def getApertureSum(imageWithMask, x, y, radius, referenceApertureRadius):
-    image = imageWithMask.data
-
-    sourceCount, noSourcePixels = getPixelSumWithinRadius(image, x, y, radius)
-
-    bgCount, noBgPixels = getPixelSumWithinRadius(image, x, y, referenceApertureRadius)
-    bgCount -= sourceCount
-    noBgPixels -= noSourcePixels
+    # Get pixels within each ellipse
+    sourcePixels = getEllipsePixels(image, ellipse)
+    widerEllipsePixels = getEllipsePixels(image, widerEllipse)
+    annulusPixels = np.logical_xor(sourcePixels, widerEllipsePixels)
 
 
-    sourceMinusBg = sourceCount - noSourcePixels * (bgCount/noBgPixels)
+    # Find the sum of counts
+    data = image.data
+    bgCnt = np.sum(data[annulusPixels])
+    sourceCnt = np.sum(data[sourcePixels])
+
+    Nbg = np.count_nonzero(annulusPixels)
+    Nsource = np.count_nonzero(sourcePixels)
 
 
-    return sourceMinusBg
+    # Subtract contribution from background
+    sourceCnt -= Nsource * (bgCnt / Nbg)
+
+    return sourceCnt
+
+
+def getApertureSumsEllipses(image, ellipses, delta):
+    return [getApertureSumEllipse(image, ellipse, delta) for ellipse in ellipses]
 
 
 def convertToMagnitudes(apertureSums):
@@ -44,4 +49,6 @@ def convertToMagnitudes(apertureSums):
     zeroPtErr = header["MAGZRR"]
 
     return zeroPt - 2.5*np.log10(apertureSums)
+
+
 # %%

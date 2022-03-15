@@ -6,7 +6,7 @@ from numba import jit
 from uncertainties import unumpy
 from plot_data import *
 from load_data import *
-
+from ellipses import *
 
 
 def findBrightestSources(image, N):
@@ -15,11 +15,11 @@ def findBrightestSources(image, N):
     pixelIndices = np.flip(np.argsort(image.filled(0), axis=None))
 
 
-    sourcePositions = []
+    sourceEllipses = []
 
 
     for index in pixelIndices:
-        if len(sourcePositions) >= N:
+        if len(sourceEllipses) >= N:
             break
 
         y, x = np.unravel_index(index, image.shape)
@@ -30,21 +30,21 @@ def findBrightestSources(image, N):
             continue
 
 
-        # Store the x, y of this source
-        sourcePositions.append((x, y))
-
-
+        # Fit an ellipse to the source and store it
         ellipse = fitEllipseToSource(image, x, y)
-
+        sourceEllipses.append(ellipse)
 
 
         # Mask the region contained within the ellipse
-        ellipsePixels = cv2.ellipse(np.zeros(image.shape), ellipse, (255,255,255), cv2.FILLED)
+        ellipsePixels = getEllipsePixels(image, ellipse)
+        print(ellipsePixels)
+
+
 
         image.mask = np.logical_or(image.mask, ellipsePixels)
 
 
-    return sourcePositions
+    return sourceEllipses
 
 
 
@@ -53,9 +53,12 @@ def fitEllipseToSource(image, x, y):
     cleanData = getPixelsWithinSource(image, x, y)
     ellipse = fitEllipseToCleanData(cleanData, x, y)
 
+    largerEllipse = enlargeEllipse(ellipse, 25)
+
 
     plotZScale(image.data, "gray")
     plotEllipse(ellipse)
+    plotEllipse(largerEllipse)
     plt.title("source at (%d, %d)" % (x, y))
 
     # Zoom into this source
@@ -77,11 +80,6 @@ def getPixelsWithinSource(image, x, y):
     mask = image.mask
     cleanData = np.logical_not(mask).astype(np.uint8)
 
-
-    # plt.figure(dpi=400)
-    # plt.imshow(data)
-    # plt.title("source at (%d, %d)" % (x, y))
-    # plt.show()
 
 
     # Find the group of pixels connected to the source using skimage.segmentation.flood
@@ -121,6 +119,5 @@ def fitEllipseToCleanData(cleanData, x, y):
 
 
     return ellipse
-
 
 # %%

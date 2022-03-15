@@ -45,10 +45,13 @@ def plotCircles(image, sourcePositions):
 
 def plotEllipse(ellipse):
     # Ellipse format given by opencv
-    xy = ellipse[0]
-    majorAxLength, minorAxLength = ellipse[1]
-    angle = ellipse[2]
+    (x, y), (majorAxLength, minorAxLength), angle = ellipse
 
 
-    ellipsePatch = Ellipse(xy, majorAxLength, minorAxLength, angle, fc="#00000000", ec="blue")
+    ellipsePatch = Ellipse((x, y), majorAxLength, minorAxLength, angle, fc="#00000000", ec="blue")
     plt.gca().add_patch(ellipsePatch)
+
+
+def plotEllipses(ellipses):
+    for ellipse in ellipses:
+        plotEllipse(ellipse)

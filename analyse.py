@@ -4,13 +4,13 @@ from plot_data import *
 from background_threshold import *
 from source_detection import *
 from photometry import *
-
+# %%
 # Exclude the vertical line and artefacts (e.g. edge effects) from our analysis of the background
 cleanImage = getCleanImage()
 
 # Calculate the background threshold
 threshold = getBackgroundThreshold(cleanImage).n
-
+# %%
 # Load in the image and remove bad sections so we can detect sources
 image = getImage()
 image = maskBackground(image, threshold)
@@ -19,34 +19,27 @@ image = cropImage(image, ymin=500, ymax=4500, xmax=2500)
 
 # %%
 # Detect sources
-sourcePositions = findBrightestSources(image, 10)
+sourceEllipses = findBrightestSources(image, 10)
 # %%
-plotCircles(image, sourcePositions)
+
+plotZScale(image.data)
+plotEllipses(sourceEllipses)
 
 # %%
 # Photometry
-apertureSums = [getApertureSum(image, *pos, 12, 24) for pos in sourcePositions]
+apertureSums = getApertureSumsEllipses(image, sourceEllipses, 25)
 
-
-# Some apertureSums are -ve
-# due to the 12px aperture being too small
-# Exclude these sources
-
-sourcePositions = np.array(sourcePositions)
-apertureSums = np.array(apertureSums)
-
-
-sourcePositions = sourcePositions[apertureSums > 0]
-apertureSums = apertureSums[apertureSums > 0]
-
-# %%
 # Calculate magnitudes from the pixel sums
 magnitudes = convertToMagnitudes(apertureSums)
 
+
+# %%
 print("List of sources identified")
 print("--------------------------------")
-for ((x, y), mag) in zip(sourcePositions, magnitudes):
-    print("x: %d, y: %d, magnitude: %.2f" % (x, y, mag))
+
+for (ellipse, mag) in zip(sourceEllipses, magnitudes):
+    x, y = ellipse[0]
+    print("x: %.2f, y: %.2f, magnitude: %.2f" % (x, y, mag))
 
 # %%
 plt.figure(dpi=400)
