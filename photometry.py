@@ -1,5 +1,6 @@
 # %%
 import numpy as np
+from uncertainties import unumpy
 from load_data import *
 from plot_data import *
 from ellipses import *
@@ -59,14 +60,17 @@ def getApertureSumEllipse(image, ellipse, delta, plot=False):
 
 
 def getApertureSumsEllipses(image, ellipses, delta):
-    return [getApertureSumEllipse(image, ellipse, delta) for ellipse in ellipses]
+    apertureSums = np.array([getApertureSumEllipse(image, ellipse, delta) for ellipse in ellipses])
+    errors = np.sqrt(apertureSums)
+
+    return unumpy.uarray(apertureSums, errors)
 
 
 def convertToMagnitudes(apertureSums):
     zeroPt = header["MAGZPT"]
     zeroPtErr = header["MAGZRR"]
 
-    return zeroPt - 2.5*np.log10(apertureSums)
+    return zeroPt - 2.5*unumpy.log10(apertureSums)
 
 
 # %%

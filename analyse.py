@@ -23,7 +23,7 @@ plotZScale(image.filled(0))
 
 # %%
 # Detect sources
-sourceEllipses = findBrightestSources(image, 200)
+sourceEllipses = findBrightestSources(image, 10)
 # %%
 
 plotZScale(image.data)
@@ -43,7 +43,7 @@ print("--------------------------------")
 
 for (ellipse, mag) in zip(sourceEllipses, magnitudes):
     x, y = ellipse[0]
-    print("x: %.2f, y: %.2f, magnitude: %.2f" % (x, y, mag))
+    print("x: %.2f, y: %.2f, magnitude: %s" % (x, y, mag.format("%.2u")))
 
 # %%
 plt.figure(dpi=400)
