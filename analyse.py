@@ -4,6 +4,8 @@ from plot_data import *
 from background_threshold import *
 from source_detection import *
 from photometry import *
+from logNm import *
+
 # %%
 # Exclude the vertical line and artefacts (e.g. edge effects) from our analysis of the background
 cleanPixels = getCleanPixels()
@@ -31,7 +33,7 @@ plotZScale(maskedImage)
 # %%
 
 # Detect sources
-sourceEllipses = detectSources(image, 100)
+sourceEllipses = detectSources(image)
 
 # %%
 
@@ -61,8 +63,7 @@ for (ellipse, mag) in zip(sourceEllipses, magnitudes):
     print("x: %.2f, y: %.2f, magnitude: %s" % (x, y, mag.format("%.2u")))
 
 # %%
-plt.figure(dpi=400)
-plt.hist(magnitudes, bins=30)
-plt.xlabel("magnitude")
-plt.ylabel("number of sources")
+
+plotLogNm(magnitudes)
+
 # %%

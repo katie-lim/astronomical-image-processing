@@ -41,6 +41,13 @@ def getApertureSumEllipse(image, ellipse, delta, plot=False):
     sourceCnt -= Nsource * (bgCnt / Nbg)
 
 
+    if sourceCnt < 0:
+        print("Source at (%d, %d) has an aperture sum less than 0." % (ellipse[0][0], ellipse[0][1]))
+        print(ellipse)
+
+        plot = True
+
+
     # Plot the result
     if plot:
         plotZScale(image.data, "gray")
