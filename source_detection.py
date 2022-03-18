@@ -44,7 +44,8 @@ def detectSources(image, N=-1, debug=False):
 
 
         # Fit an ellipse to the source and store it
-        success, ellipse = fitEllipseToSource(image, x, y)
+        cleanData = getPixelsWithinSource(image, x, y)
+        success, ellipse = fitEllipseToCleanData(cleanData, x, y)
 
         if not success:
             continue
@@ -63,6 +64,21 @@ def detectSources(image, N=-1, debug=False):
 
 
 
+        lengthThreshold = 150
+        if (majorAxLength > lengthThreshold) or (minorAxLength > lengthThreshold):
+            if debug:
+                print("Warning: source at (%d, %d) produced a very large ellipse. Ignoring this source." % (x, y))
+
+
+            # Mask the pixels connected to this source
+            image.mask = np.logical_or(image.mask, cleanData)
+
+
+            continue
+
+
+
+
         sourceEllipses.append(ellipse)
 
 
@@ -76,14 +92,6 @@ def detectSources(image, N=-1, debug=False):
 
     return sourceEllipses
 
-
-
-
-def fitEllipseToSource(image, x, y):
-    cleanData = getPixelsWithinSource(image, x, y)
-    ellipse = fitEllipseToCleanData(cleanData, x, y)
-
-    return ellipse
 
 
 
