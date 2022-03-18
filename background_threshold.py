@@ -28,7 +28,7 @@ def getCleanPixels():
 
 
 
-def getBackgroundThreshold(image, bins=100, Nsigma=5):
+def getBackgroundThreshold(image, bins=50, Nsigma=5):
     """In order to eliminate the background,
 we have to find a reasonable value for the background
 

@@ -9,7 +9,9 @@ from load_data import *
 from ellipses import *
 
 
-def findBrightestSources(image, N):
+def detectSources(image, N=-1, debug=False):
+
+    height, width = image.shape
 
     # Pixels in order of brightest to dimmest
     pixelIndices = np.flip(np.argsort(image.filled(0), axis=None))
@@ -19,7 +21,7 @@ def findBrightestSources(image, N):
 
 
     for index in pixelIndices:
-        if len(sourceEllipses) >= N:
+        if N != -1 and len(sourceEllipses) >= N:
             break
 
         y, x = np.unravel_index(index, image.shape)
@@ -30,11 +32,36 @@ def findBrightestSources(image, N):
             continue
 
 
+        # Check whether this pixel lies near an edge
+        # If so, skip this pixel to avoid errors from edge effects
+        edgeThreshold = 50
+
+        if (x < edgeThreshold) or (x > width - edgeThreshold) or (y < edgeThreshold) or (y > height - edgeThreshold):
+            if debug:
+                print("Skipping source at (%d, %d) as it is too close to image edge." % (x, y))
+            continue
+
+
+
         # Fit an ellipse to the source and store it
         success, ellipse = fitEllipseToSource(image, x, y)
 
         if not success:
             continue
+
+
+        # Perform checks on the ellipse
+        (xEl, yEl), (majorAxLength, minorAxLength), angle = ellipse
+
+
+        # Check position of ellipse centre
+        centreDistThreshold = 15
+        if (x-xEl)**2 + (y-yEl)**2 > centreDistThreshold**2:
+            if debug:
+                print("Warning: source at (%d, %d) produced a ellipse aligned off centre. Ignoring this source." % (x, y))
+            continue
+
+
 
         sourceEllipses.append(ellipse)
 
@@ -105,7 +132,7 @@ def fitEllipseToCleanData(cleanData, x, y):
     cnt = contours[0]
 
     if len(cnt) < 5:
-        print("Need 5 points to fit an ellipse to the source at (%d, %d)." % (x, y))
+        # print("Need 5 points to fit an ellipse to the source at (%d, %d)." % (x, y))
 
         # (success, ellipse)
         return (False, None)
