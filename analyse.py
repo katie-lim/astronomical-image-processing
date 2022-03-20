@@ -23,8 +23,8 @@ image = cropImage(image, ymin=500, ymax=4400, xmin=100, xmax=2350)
 
 # Run on a small section of the image
 
-image = image[0:1000, 0:1000]
-# image = image[1000:2000, 0000:1000]
+# image = image[0:1000, 0:1000]
+image = image[1000:2000, 0000:1000]
 
 
 # %%

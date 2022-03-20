@@ -84,7 +84,9 @@ def detectSources(image, N=-1, debug=False):
 
 
         # Mask the region contained within the ellipse
-        ellipsePixels = getEllipsePixels(image, ellipse)
+        # Enlarge the ellipse, to give some "buffer room" and mask pixels just outside the ellipse
+        largerEllipse = enlargeEllipse(ellipse, 5)
+        ellipsePixels = getEllipsePixels(image, largerEllipse)
 
 
         image.mask = np.logical_or(image.mask, ellipsePixels)
