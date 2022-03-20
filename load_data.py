@@ -73,3 +73,26 @@ def saveCatalogue(ellipses, apertureSums, magnitudes):
     df = pd.DataFrame({"x": x, "y": y, "majoraxislength": majorAxLengths, "minoraxislength": minorAxLengths, "angle": angles, "count": aperSums, "counterr": aperSumsErrs, "magnitude": mags, "magnitudeerr": magsErrs})
 
     df.to_csv("catalogue.csv")
+
+
+
+def loadCatalogue():
+    df = pd.read_csv("catalogue.csv", index_col=0)
+
+
+    x, y, majorAxLengths, minorAxLengths, angles, aperSums, aperSumsErrs, mags, magsErrs = df.to_numpy().T
+
+    ellipses = []
+
+    for i in range(len(x)):
+        ellipse = ((x[i], y[i]), (majorAxLengths[i], minorAxLengths[i]), angles[i])
+        ellipses.append(ellipse)
+
+    aperSumsWithErrs = unumpy.uarray(aperSums, aperSumsErrs)
+    magnitudes = unumpy.uarray(mags, magsErrs)
+
+
+    return ellipses, aperSumsWithErrs, magnitudes
+
+
+# %%

@@ -53,27 +53,12 @@ def detectSources(image, N=-1, debug=False):
 
 
         # Perform checks on the ellipse
-        (xEl, yEl), (majorAxLength, minorAxLength), angle = ellipse
+        isValidEllipse, shouldMask = checkValidEllipse(x, y, ellipse, debug)
 
-
-        # Check position of ellipse centre
-        centreDistThreshold = 15
-        if (x-xEl)**2 + (y-yEl)**2 > centreDistThreshold**2:
-            if debug:
-                print("Warning: source at (%d, %d) produced a ellipse aligned off centre. Ignoring this source." % (x, y))
-            continue
-
-
-
-        lengthThreshold = 150
-        if (majorAxLength > lengthThreshold) or (minorAxLength > lengthThreshold):
-            if debug:
-                print("Warning: source at (%d, %d) produced a very large ellipse. Ignoring this source." % (x, y))
-
-
-            # Mask the pixels connected to this source
-            image.mask = np.logical_or(image.mask, cleanData)
-
+        if not isValidEllipse:
+            if shouldMask:
+                # Mask the pixels connected to this source
+                image.mask = np.logical_or(image.mask, cleanData)
 
             continue
 
@@ -100,7 +85,6 @@ def detectSources(image, N=-1, debug=False):
 
 
 
-
 def getPixelsWithinSource(image, x, y):
 
     # Turn the image into a series of 0s and 1s
@@ -123,6 +107,7 @@ def getPixelsWithinSource(image, x, y):
 
 
     return cleanData
+
 
 
 def fitEllipseToCleanData(cleanData, x, y):
@@ -156,5 +141,37 @@ def fitEllipseToCleanData(cleanData, x, y):
 
     # (success, ellipse)
     return (True, ellipse)
+
+
+
+def checkValidEllipse(x, y, ellipse, debug):
+    isValidEllipse = True
+    shouldMask = False
+
+
+    (xEl, yEl), (majorAxLength, minorAxLength), angle = ellipse
+
+
+    # Check position of ellipse centre
+    centreDistThreshold = 15
+    if (x-xEl)**2 + (y-yEl)**2 > centreDistThreshold**2:
+        if debug:
+            print("Warning: source at (%d, %d) produced a ellipse aligned off centre. Ignoring this source." % (x, y))
+
+        isValidEllipse = False
+
+
+    # Check size of ellipse
+    lengthThreshold = 150
+    if (majorAxLength > lengthThreshold) or (minorAxLength > lengthThreshold):
+        if debug:
+            print("Warning: source at (%d, %d) produced a very large ellipse. Ignoring this source." % (x, y))
+
+        isValidEllipse = False
+        shouldMask = True
+
+
+    return isValidEllipse, shouldMask
+
 
 # %%
