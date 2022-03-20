@@ -84,9 +84,12 @@ def detectSources(image, N=-1, debug=False):
         ellipsePixels = getEllipsePixels(image, ellipse)
 
 
-        sourceEllipses.append(ellipse)
         sourceCnt = getApertureSum(image, ellipsePixels, ellipse, delta=25)
-        apertureSums.append(sourceCnt)
+
+
+        if sourceCnt > 0:
+            sourceEllipses.append(ellipse)
+            apertureSums.append(sourceCnt)
 
 
         # Mask the region contained within the ellipse

@@ -24,7 +24,7 @@ image = cropImage(image, ymin=500, ymax=4400, xmin=100, xmax=2350)
 # Run on a small section of the image
 
 # image = image[0:1000, 0:1000]
-# image = image[1000:2000, 0000:1000]
+image = image[1000:2000, 0000:1000]
 # image = image[0:2000, 0000:1000]
 
 
@@ -53,7 +53,6 @@ plotEllipses(sourceEllipses)
 
 # Calculate magnitudes from the pixel sums
 apertureSums = np.array(apertureSums)
-apertureSums = apertureSums[apertureSums > 0]
 err = np.sqrt(apertureSums)
 apertureSumsWithErr = unumpy.uarray(apertureSums, err)
 
@@ -71,5 +70,9 @@ for (ellipse, mag) in zip(sourceEllipses, magnitudes):
 # %%
 
 plotLogNm(magnitudes)
+
+# %%
+
+saveCatalogue(sourceEllipses, apertureSumsWithErr, magnitudes)
 
 # %%

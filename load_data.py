@@ -1,7 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
+import pandas as pd
+from uncertainties import unumpy
 from astropy.io import fits
-from astropy.visualization import ImageNormalize, ZScaleInterval
 
 
 filePath = "A1_mosaic.fits"
@@ -56,3 +56,20 @@ def maskCircle(image, x, y, radius):
 
 def cropImage(image, xmin=0, xmax=None, ymin=0, ymax=None):
     return image[ymin:ymax, xmin:xmax]
+
+
+
+def saveCatalogue(ellipses, apertureSums, magnitudes):
+    xy, axLengths, angles = list(zip(*ellipses))
+    x, y = list(zip(*xy))
+    majorAxLengths, minorAxLengths = list(zip(*axLengths))
+
+    aperSums = unumpy.nominal_values(apertureSums)
+    aperSumsErrs = unumpy.std_devs(apertureSums)
+
+    mags = unumpy.nominal_values(magnitudes)
+    magsErrs = unumpy.std_devs(magnitudes)
+
+    df = pd.DataFrame({"x": x, "y": y, "majoraxislength": majorAxLengths, "minoraxislength": minorAxLengths, "angle": angles, "count": aperSums, "counterr": aperSumsErrs, "magnitude": mags, "magnitudeerr": magsErrs})
+
+    df.to_csv("catalogue.csv")
