@@ -1,4 +1,5 @@
 # %%
+from uncertainties import unumpy
 from load_data import *
 from plot_data import *
 from background_threshold import *
@@ -49,6 +50,8 @@ plotEllipses(sourceEllipses)
 
 # %%
 # Photometry
+# Add errors to the counts
+aperSumsWithErr = unumpy.uarray(apertureSums, np.sqrt(apertureSums))
 
 # Calculate magnitudes from the pixel sums
 magnitudes = calcMagnitudes(apertureSums)
@@ -68,6 +71,6 @@ fitLogNm(magnitudes, mCutoff=17)
 
 # %%
 
-saveCatalogue(sourceEllipses, apertureSumsWithErr, magnitudes)
+saveCatalogue(sourceEllipses, aperSumsWithErr, magnitudes)
 
 # %%

@@ -31,7 +31,7 @@ def getApertureSum(image, sourcePixels, ellipse, delta, plot=False):
 
 
     if sourceCnt < 0:
-        print("Source at (%d, %d) has an aperture sum less than 0." % (ellipse[0][0], ellipse[0][1]))
+        print("Warning: source at (%d, %d) has an aperture sum less than 0. Ignoring this source." % (ellipse[0][0], ellipse[0][1]))
         print(ellipse)
 
         plot = True
@@ -117,20 +117,10 @@ def getApertureSumEllipse(image, ellipse, delta, plot=False):
 
 
 
-def convertToMagnitudes(apertureSums):
+def calcMagnitudes(aperSumsWithErr):
     zeroPt = ufloat(header["MAGZPT"], header["MAGZRR"])
 
-    return zeroPt - 2.5*unumpy.log10(apertureSums)
-
-
-
-def calcMagnitudes(apertureSums):
-    aperSums = np.array(apertureSums)
-    err = np.sqrt(aperSums)
-
-    aperSumsWithErr = unumpy.uarray(aperSums, err)
-
-    magnitudes = convertToMagnitudes(aperSumsWithErr)
+    magnitudes = zeroPt - 2.5*unumpy.log10(aperSumsWithErr)
 
     return magnitudes
 

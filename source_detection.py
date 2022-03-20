@@ -81,6 +81,8 @@ def detectSources(image, N=-1, debug=False):
         image.mask = np.logical_or(image.mask, ellipsePixels)
 
 
+    apertureSums = np.array(apertureSums)
+
     return sourceEllipses, apertureSums
 
 
