@@ -76,7 +76,7 @@ def fitLogNm(magnitudes, mCutoff):
 
     plotLogNm(magnitudes)
     # plt.plot(m, f(m, *x0), label="initial guess")
-    plt.plot(m, f(m, *x), label="fit")
+    plt.plot(m, f(m, *x), label="fit", zorder=100)
     plt.legend()
     plt.show()
 

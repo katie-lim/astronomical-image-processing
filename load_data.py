@@ -54,6 +54,16 @@ def maskCircle(image, x, y, radius):
 
 
 
+def maskRectangle(image, xmin, xmax, ymin, ymax):
+
+    for y in range(ymin, ymax+1):
+        for x in range(xmin, xmax+1):
+            image[y, x] = np.ma.masked
+
+    return image
+
+
+
 def cropImage(image, xmin=0, xmax=None, ymin=0, ymax=None):
     return image[ymin:ymax, xmin:xmax]
 

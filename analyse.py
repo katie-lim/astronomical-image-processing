@@ -19,6 +19,18 @@ image = getImage()
 image = maskBackground(image, threshold)
 image = maskVerticalLine(image, 1410, 1470)
 image = maskCircle(image, 1440, 3200, 300)
+
+
+bleedingSources = [(2091, 2185, 3704, 3809),
+                    (717, 867, 3195, 3423),
+                    (917, 1034, 2695, 2843),
+                    (851, 968, 2217, 2364)]
+
+
+for (xmin, xmax, ymin, ymax) in bleedingSources:
+    image = maskRectangle(image, xmin, xmax, ymin, ymax)
+
+
 image = cropImage(image, ymin=500, ymax=4400, xmin=100, xmax=2350)
 # %%
 
@@ -67,7 +79,7 @@ for (ellipse, mag) in zip(sourceEllipses, magnitudes):
 
 # %%
 
-fitLogNm(magnitudes, mCutoff=17)
+gradient, yintercept = fitLogNm(magnitudes, mCutoff=17)
 
 # %%
 
