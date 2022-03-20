@@ -2,11 +2,11 @@
 import cv2
 from skimage.segmentation import flood
 import numpy as np
-from numba import jit
 from uncertainties import unumpy
 from plot_data import *
 from load_data import *
 from ellipses import *
+from photometry import *
 
 
 def detectSources(image, N=-1, debug=False):
@@ -18,6 +18,7 @@ def detectSources(image, N=-1, debug=False):
 
 
     sourceEllipses = []
+    apertureSums = []
 
 
     for index in pixelIndices:
@@ -78,21 +79,21 @@ def detectSources(image, N=-1, debug=False):
 
 
 
+        # Enlarge the ellipse, to give some "buffer room" and include pixels just outside the ellipse that may be part of the source
+        ellipse = enlargeEllipse(ellipse, 5)
+        ellipsePixels = getEllipsePixels(image, ellipse)
+
 
         sourceEllipses.append(ellipse)
-
+        sourceCnt = getApertureSum(image, ellipsePixels, ellipse, delta=25)
+        apertureSums.append(sourceCnt)
 
 
         # Mask the region contained within the ellipse
-        # Enlarge the ellipse, to give some "buffer room" and mask pixels just outside the ellipse
-        largerEllipse = enlargeEllipse(ellipse, 5)
-        ellipsePixels = getEllipsePixels(image, largerEllipse)
-
-
         image.mask = np.logical_or(image.mask, ellipsePixels)
 
 
-    return sourceEllipses
+    return sourceEllipses, apertureSums
 
 
 

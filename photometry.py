@@ -6,6 +6,55 @@ from plot_data import *
 from ellipses import *
 
 
+def getApertureSum(image, sourcePixels, ellipse, delta, plot=False):
+    # Enlarge the ellipse to create an annular reference aperture
+    widerEllipse = enlargeEllipse(ellipse, delta)
+
+
+    # Get pixels within each ellipse
+    widerEllipsePixels = getEllipsePixels(image, widerEllipse)
+    annulusPixels = np.logical_xor(sourcePixels, widerEllipsePixels)
+
+
+    # Find the sum of counts
+    data = image.data
+    bgCnt = np.sum(data[annulusPixels])
+    sourceCnt = np.sum(data[sourcePixels])
+
+    Nbg = np.count_nonzero(annulusPixels)
+    Nsource = np.count_nonzero(sourcePixels)
+
+
+    # Subtract contribution from background
+    sourceCnt -= Nsource * (bgCnt / Nbg)
+
+
+    if sourceCnt < 0:
+        print("Source at (%d, %d) has an aperture sum less than 0." % (ellipse[0][0], ellipse[0][1]))
+        print(ellipse)
+
+        plot = True
+
+
+    # Plot the result
+    if plot:
+        plotZScale(image.data, "gray")
+        plotEllipses([ellipse, widerEllipse])
+        x, y = ellipse[0]
+        plt.title("source at (%.2f, %.2f)" % (x, y))
+
+        # Zoom into this source
+        boxSize = 100
+        plt.xlim(x-boxSize, x+boxSize)
+        plt.ylim(y-boxSize, y+boxSize)
+
+        plt.show()
+
+
+    return sourceCnt
+
+
+
 def getApertureSumEllipse(image, ellipse, delta, plot=False):
     """
     Returns the sum of pixel counts within the given ellipse.
