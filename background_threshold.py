@@ -20,15 +20,11 @@ def getCleanPixels():
     pixels = image.data[image.mask == False]
 
 
-    # Restrict to pixel values between 3300 & 3600
-    pixels = pixels[(pixels > 3300) & (pixels < 3600)]
-
-
     return pixels
 
 
 
-def getBackgroundThreshold(image, bins=50, Nsigma=5):
+def getBackgroundThreshold(image, minVal, maxVal, bins=50, Nsigma=5):
     """In order to eliminate the background,
 we have to find a reasonable value for the background
 
@@ -44,7 +40,7 @@ The function returns the threshold of the background"""
 
 
     plt.figure(dpi=400)
-    heights, bins, patches = plt.hist(image, bins, label="data")
+    heights, bins, patches = plt.hist(image, bins, range=[minVal, maxVal], label="data")
     binCentres = (bins[1:] + bins[:-1])/2
 
 

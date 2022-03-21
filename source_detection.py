@@ -25,7 +25,10 @@ def detectSources(image, N=-1, debug=False):
         if N != -1 and len(sourceEllipses) >= N:
             break
 
-        y, x = np.unravel_index(index, image.shape)
+
+        # This is quicker than using unravel_index
+        y, x = index % height, index // height
+
 
 
         # Check whether this pixel is masked
@@ -62,6 +65,9 @@ def detectSources(image, N=-1, debug=False):
 
             continue
 
+
+        if debug:
+            print(ellipse)
 
 
         # Enlarge the ellipse, to give some "buffer room" and include pixels just outside the ellipse that may be part of the source

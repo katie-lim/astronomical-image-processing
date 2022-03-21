@@ -12,7 +12,7 @@ from logNm import *
 cleanPixels = getCleanPixels()
 
 # Calculate the background threshold
-threshold = getBackgroundThreshold(cleanPixels).n
+threshold = getBackgroundThreshold(cleanPixels, 3300, 3600).n
 # %%
 # Load in the image and remove bad sections so we can detect sources
 image = getImage()
@@ -83,6 +83,7 @@ gradient, yintercept = fitLogNm(magnitudes, mCutoff=17)
 
 # %%
 
+# sourceEllipses, aperSumsWithErr, magnitudes = loadCatalogue()
 saveCatalogue(sourceEllipses, aperSumsWithErr, magnitudes)
 
 # %%
