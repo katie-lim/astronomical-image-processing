@@ -24,7 +24,7 @@ def getCleanPixels():
 
 
 
-def getBackgroundThreshold(image, minVal, maxVal, bins=50, Nsigma=5):
+def getBackgroundThreshold(data, bins=50, Nsigma=5):
     """In order to eliminate the background,
 we have to find a reasonable value for the background
 
@@ -35,12 +35,20 @@ The threshold is determined using 5 standard deviation from the mean
 
 The function returns the threshold of the background"""
 
+    data = data.flatten()
 
-    image = image.flatten()
+    # Find the region to restrict the pixel value histogram to
+    # that just includes bg and excludes bright pixels (sources)
+    lowBound, uppBound = getLowerAndUpperBackgroundBound(data)
+
+
+    # Restrict to just pixels within the background range
+    data = data[data >= lowBound]
+    data = data[data <= uppBound]
 
 
     plt.figure(dpi=400)
-    heights, bins, patches = plt.hist(image, bins, range=[minVal, maxVal], label="data")
+    heights, bins, patches = plt.hist(data, bins, label="data")
     binCentres = (bins[1:] + bins[:-1])/2
 
 
@@ -49,9 +57,13 @@ The function returns the threshold of the background"""
         return A*np.exp(-(x - mu)**2 / (2 * sigma**2))
 
 
-    p0 = [np.mean(image), np.std(image), np.max(heights)]
+    p0 = [np.mean(data), np.std(data), np.max(heights)]
     params, cov = curve_fit(gaussian, binCentres, heights, p0)
     errors = np.sqrt(np.diag(cov))
+
+    # Make sure sigma is positive
+    params[1] = np.abs(params[1])
+
     paramsWithErrors = unumpy.uarray(params, errors)
     mu, sigma, A = paramsWithErrors
 
@@ -85,4 +97,28 @@ The function returns the threshold of the background"""
 
 
     return threshold
+
+
+
+def getLowerAndUpperBackgroundBound(data):
+    data = data.flatten()
+    heights, binEdges = np.histogram(data, bins=1000)
+    bins = (binEdges[1:] + binEdges[:-1])/2
+
+    maxIndex = np.argmax(heights)
+    heightThreshold = heights[maxIndex]*0.01
+
+    left = heights[:maxIndex]
+    right = heights[maxIndex:]
+
+    leftIndex = np.argmin(abs(left - heightThreshold))
+    rightIndex = np.argmin(abs(right - heightThreshold))
+
+
+    lowBound, uppBound = bins[leftIndex], bins[len(left) + rightIndex]
+
+
+    return lowBound, uppBound
+
+
 # %%
