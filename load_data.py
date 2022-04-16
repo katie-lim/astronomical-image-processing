@@ -64,6 +64,19 @@ def maskRectangle(image, xmin, xmax, ymin, ymax):
 
 
 
+def maskEdges(image, xmin=0, xmax=None, ymin=0, ymax=None):
+    # image[ymin:ymax, xmin:xmax] = np.ma.masked
+    height, width = image.shape
+
+    image[0:ymin, : ] = np.ma.masked
+    image[ymax:height, : ] = np.ma.masked
+    image[ : ,0:xmin] = np.ma.masked
+    image[ : ,xmax:width] = np.ma.masked
+
+    return image
+
+
+
 def cropImage(image, xmin=0, xmax=None, ymin=0, ymax=None):
     return image[ymin:ymax, xmin:xmax]
 

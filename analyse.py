@@ -24,14 +24,15 @@ image = maskCircle(image, 1440, 3200, 300)
 bleedingSources = [(2091, 2185, 3704, 3809),
                     (717, 867, 3195, 3423),
                     (917, 1034, 2695, 2843),
-                    (851, 968, 2217, 2364)]
+                    (851, 968, 2217, 2364),
+                    (1000, 1670, 0, 537)]
 
 
 for (xmin, xmax, ymin, ymax) in bleedingSources:
     image = maskRectangle(image, xmin, xmax, ymin, ymax)
 
 
-image = cropImage(image, ymin=500, ymax=4400, xmin=100, xmax=2350)
+image = maskEdges(image, ymin=500, ymax=4400, xmin=100, xmax=2350)
 # %%
 
 # Run on a small section of the image
