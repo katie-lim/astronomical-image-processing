@@ -35,6 +35,18 @@ def plotMinMax(image, cmap="gray"):
 
 
 
+def plotZoomedIn(image, x, y, boxWidth, boxHeight, zscale=True):
+    if zscale:
+        plotZScale(image)
+    else:
+        plotMinMax(image)
+
+    plt.xlim(x - boxWidth//2, x + boxWidth//2)
+    plt.ylim(y - boxHeight//2, y + boxHeight//2)
+    plt.show()
+
+
+
 def plotCircles(image, sourcePositions):
     plotZScale(image.data)
 

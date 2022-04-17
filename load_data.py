@@ -82,6 +82,25 @@ def cropImage(image, xmin=0, xmax=None, ymin=0, ymax=None):
 
 
 
+def doManualMasking(image):
+    image = maskVerticalLine(image, 1410, 1470)
+    image = maskCircle(image, 1420, 3220, 400)
+    image = maskEdges(image, ymin=200, ymax=4400, xmin=200, xmax=2400)
+
+    bleedingSources = [(2091, 2185, 3704, 3809),
+                        (717, 867, 3195, 3423),
+                        (917, 1034, 2695, 2843),
+                        (851, 968, 2217, 2364),
+                        (1000, 1670, 0, 537)]
+
+    for (xmin, xmax, ymin, ymax) in bleedingSources:
+        image = maskRectangle(image, xmin, xmax, ymin, ymax)
+
+    return image
+
+
+
+
 def saveCatalogue(ellipses, apertureSums, magnitudes):
     xy, axLengths, angles = list(zip(*ellipses))
     x, y = list(zip(*xy))
