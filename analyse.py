@@ -12,7 +12,7 @@ from logNm import *
 cleanPixels = getCleanPixels()
 
 # Calculate the background threshold
-threshold = getBackgroundThreshold(cleanPixels).n
+threshold = getBackgroundThreshold(cleanPixels, bins=25).n
 # %%
 # Load in the image and remove bad sections so we can detect sources
 image = getImage()

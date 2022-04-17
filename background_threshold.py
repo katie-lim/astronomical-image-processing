@@ -20,7 +20,7 @@ def getCleanPixels():
 
 
 
-def getBackgroundThreshold(data, bins=50, Nsigma=5):
+def getBackgroundThreshold(data, bins=30, Nsigma=5):
     """In order to eliminate the background,
 we have to find a reasonable value for the background
 
@@ -98,23 +98,11 @@ The function returns the threshold of the background"""
 
 def getLowerAndUpperBackgroundBound(data):
     data = data.flatten()
-    heights, binEdges = np.histogram(data, bins=1000)
-    bins = (binEdges[1:] + binEdges[:-1])/2
 
-    maxIndex = np.argmax(heights)
-    heightThreshold = heights[maxIndex]*0.01
+    # Remove the bottom 1% of the data
+    # and the top 5% of the data (sources, with very high pixel values)
 
-    left = heights[:maxIndex]
-    right = heights[maxIndex:]
-
-    leftIndex = np.argmin(abs(left - heightThreshold))
-    rightIndex = np.argmin(abs(right - heightThreshold))
-
-
-    lowBound, uppBound = bins[leftIndex], bins[len(left) + rightIndex]
-
-
-    return lowBound, uppBound
+    return (np.percentile(data, 1), np.percentile(data, 95))
 
 
 # %%
