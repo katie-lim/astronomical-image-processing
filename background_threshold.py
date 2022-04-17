@@ -20,7 +20,7 @@ def getCleanPixels():
 
 
 
-def getBackgroundThreshold(data, bins=30, Nsigma=5):
+def getBackgroundThreshold(data, Nbins=30, Nsigma=5, plot=True, returnFit=False):
     """In order to eliminate the background,
 we have to find a reasonable value for the background
 
@@ -43,8 +43,13 @@ The function returns the threshold of the background"""
     data = data[data <= uppBound]
 
 
-    plt.figure(dpi=400)
-    heights, bins, patches = plt.hist(data, bins, label="data")
+    if plot:
+        plt.figure(dpi=400)
+
+        heights, bins, patches = plt.hist(data, Nbins, label="data")
+    else:
+        heights, bins = np.histogram(data, Nbins)
+
     binCentres = (bins[1:] + bins[:-1])/2
 
 
@@ -73,26 +78,30 @@ The function returns the threshold of the background"""
 
 
     # Plot the resulting fit
-    x = np.linspace(binCentres[0], binCentres[-1], 500)
-    plt.plot(x, gaussian(x, *params), label="Gaussian fit")
-    plt.vlines(threshold.n, 0, heights.max(), color="r", linestyles="dotted", label="5$\sigma$ threshold")
+    if plot:
+        x = np.linspace(binCentres[0], binCentres[-1], 500)
+        plt.plot(x, gaussian(x, *params), label="Gaussian fit")
+        plt.vlines(threshold.n, 0, heights.max(), color="r", linestyles="dotted", label="5$\sigma$ threshold")
 
 
-    plt.xlabel("pixel value")
-    ylabel = "number of pixels"
-    plt.ylabel(ylabel)
-    plt.legend()
-    plt.title("histogram of pixel values")
-    plt.show()
+        plt.xlabel("pixel value")
+        ylabel = "number of pixels"
+        plt.ylabel(ylabel)
+        plt.legend()
+        plt.title("histogram of pixel values")
+        plt.show()
 
 
-    # Print the results
-    print("Gaussian fit parameters mu, sigma, A:")
-    print([p.format("%.2u") for p in paramsWithErrors])
-    print("")
+        # Print the results
+        print("Gaussian fit parameters mu, sigma, A:")
+        print([p.format("%.2u") for p in paramsWithErrors])
+        print("")
 
 
-    return threshold
+    if returnFit:
+        return params
+    else:
+        return threshold
 
 
 

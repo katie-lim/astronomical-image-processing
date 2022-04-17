@@ -10,7 +10,7 @@ from scipy import interpolate
 cleanPixels = getCleanPixels()
 
 # Calculate background threshold for the entire image
-threshold = getBackgroundThreshold(cleanPixels, Nsigma=5).n
+threshold = getBackgroundThreshold(cleanPixels, Nbins=25, Nsigma=5).n
 
 # %%
 
@@ -21,7 +21,7 @@ image[image > threshold] = np.ma.masked # Mask bright pixels (sources) so they d
 
 # %%
 
-def calculateSkyBg(image, Nx, Ny):
+def calculateSkyBg(image, Nx, Ny, Nsigma=5):
     height, width = image.shape
     xSize, ySize = width // Nx, height // Ny
 
@@ -31,9 +31,11 @@ def calculateSkyBg(image, Nx, Ny):
     blockX = np.arange(xSize//2, width, xSize)
     blockY = np.arange(ySize//2, height, ySize)
     blockBg = []
+    blockSigma = []
 
 
     # Plot the blocks
+    print("Calculating sky background.")
     plotZScale(image)
     plt.vlines(blockX, 0, height)
     plt.hlines(blockY, 0, width)
@@ -47,20 +49,29 @@ def calculateSkyBg(image, Nx, Ny):
         while (x < width):
             block = image[y - ySize//2:y + ySize//2, x - xSize//2:x + xSize//2]
 
-            median = np.ma.median(block)
-            std = np.ma.std(block)
 
-            if (median):
-                blockBg.append(median)
+            # If the block isn't completely masked
+            if (not np.all(block.mask)):
+
+                # Fit a Gaussian to the pixels in the block
+                validPixels = block[block.mask == False]
+
+                mu, sigma, A = getBackgroundThreshold(validPixels.flatten(), Nbins=25, returnFit=True, plot=False)
+
+                blockBg.append(mu)
+                blockSigma.append(sigma)
+
             else:
-                # If the block is entirely masked, we can't calculate the median
-                # so just use the previous block's median
+                # If the block is entirely masked, we can't calculate the bg
+                # so just use the previous block's values
                 # (this doesn't affect our results because masked pixels are ignored when detecting sources)
                 blockBg.append(blockBg[-1])
+                blockSigma.append(blockSigma[-1])
 
 
             # Debugging
             # print((x, y))
+            # if std: plt.hist(block[block.mask == False], bins=30)
             # plotZoomedIn(image, x, y, xSize, ySize, zscale=True)
             # print("Mean: %.2f, Median: %.2f, Std: %.2f" % (mean, median, std))
 
@@ -71,6 +82,7 @@ def calculateSkyBg(image, Nx, Ny):
 
 
     blockBg = np.array(blockBg).reshape((Ny, Nx))
+    blockSigma = np.array(blockSigma).reshape((Ny, Nx))
 
     # Interpolate between the blocks to calculate the sky background
     f = interpolate.RectBivariateSpline(blockX, blockY, blockBg.T)
@@ -80,16 +92,23 @@ def calculateSkyBg(image, Nx, Ny):
 
     bg = f(imageX, imageY).T
 
-    print(blockX)
-    print(blockY)
+
+    # Calculate the threshold above which a pixel is considered a source
+    # Take the threshold to be 5 sigma (by default)
+    blockThreshold = blockSigma * Nsigma
+
+    # Once again, interpolate between the blocks
+    f = interpolate.RectBivariateSpline(blockX, blockY, blockThreshold.T)
+
+    threshold = f(imageX, imageY).T
 
 
-    return bg
+    return bg, threshold
 
 # %%
 Nx, Ny = 8, 12
 
-bg = calculateSkyBg(image, Nx, Ny)
+bg, threshold = calculateSkyBg(image, Nx, Ny)
 
 # %%
 
@@ -107,5 +126,15 @@ plotZScale(bgMasked)
 plt.show()
 
 # %%
-plotZScale(image.data)
+# Plot the source threshold (5 sigma)
+plotZScale(threshold)
+plt.show()
+# %%
+
+# Plot the source threshold, showing masked regions
+thresholdMasked = np.ma.MaskedArray(threshold, False)
+thresholdMasked = doManualMasking(thresholdMasked)
+
+plotZScale(thresholdMasked)
+plt.show()
 # %%
