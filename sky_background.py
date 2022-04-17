@@ -6,22 +6,13 @@ from background_threshold import *
 from scipy import interpolate
 
 # %%
-# Exclude the vertical line and artefacts (e.g. edge effects) from our analysis of the background
-cleanPixels = getCleanPixels()
 
-# Calculate background threshold for the entire image
-threshold = getBackgroundThreshold(cleanPixels, Nbins=25, Nsigma=5).n
+def calculateSkyBg(Nx, Ny, Nsigma=5):
+    # Load in the image
+    image = getImage()
+    image = doManualMasking(image)
 
-# %%
 
-# Load in the image
-image = getImage()
-image = doManualMasking(image)
-image[image > threshold] = np.ma.masked # Mask bright pixels (sources) so they don't affect our calculation of background
-
-# %%
-
-def calculateSkyBg(image, Nx, Ny, Nsigma=5):
     height, width = image.shape
     xSize, ySize = width // Nx, height // Ny
 
@@ -106,35 +97,35 @@ def calculateSkyBg(image, Nx, Ny, Nsigma=5):
     return bg, threshold
 
 # %%
-Nx, Ny = 8, 12
+# Nx, Ny = 8, 12
 
-bg, threshold = calculateSkyBg(image, Nx, Ny)
+# bg, threshold = calculateSkyBg(image, Nx, Ny)
 
-# %%
+# # %%
 
-# Plot the background
-plotZScale(bg)
-plt.show()
+# # Plot the background
+# plotZScale(bg)
+# plt.show()
 
-# %%
+# # %%
 
-# Plot the background, showing masked regions
-bgMasked = np.ma.MaskedArray(bg, False)
-bgMasked = doManualMasking(bgMasked)
+# # Plot the background, showing masked regions
+# bgMasked = np.ma.MaskedArray(bg, False)
+# bgMasked = doManualMasking(bgMasked)
 
-plotZScale(bgMasked)
-plt.show()
+# plotZScale(bgMasked)
+# plt.show()
 
-# %%
-# Plot the source threshold (5 sigma)
-plotZScale(threshold)
-plt.show()
-# %%
+# # %%
+# # Plot the source threshold (5 sigma)
+# plotZScale(threshold)
+# plt.show()
+# # %%
 
-# Plot the source threshold, showing masked regions
-thresholdMasked = np.ma.MaskedArray(threshold, False)
-thresholdMasked = doManualMasking(thresholdMasked)
+# # Plot the source threshold, showing masked regions
+# thresholdMasked = np.ma.MaskedArray(threshold, False)
+# thresholdMasked = doManualMasking(thresholdMasked)
 
-plotZScale(thresholdMasked)
-plt.show()
-# %%
+# plotZScale(thresholdMasked)
+# plt.show()
+# # %%

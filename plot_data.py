@@ -35,7 +35,7 @@ def plotMinMax(image, cmap="gray"):
 
 
 
-def plotZoomedIn(image, x, y, boxWidth, boxHeight, zscale=True):
+def plotZoomedIn(image, x, y, boxWidth, boxHeight, zscale=True, show=True):
     if zscale:
         plotZScale(image)
     else:
@@ -43,7 +43,9 @@ def plotZoomedIn(image, x, y, boxWidth, boxHeight, zscale=True):
 
     plt.xlim(x - boxWidth//2, x + boxWidth//2)
     plt.ylim(y - boxHeight//2, y + boxHeight//2)
-    plt.show()
+
+    if show:
+        plt.show()
 
 
 

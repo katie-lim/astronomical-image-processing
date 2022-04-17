@@ -3,34 +3,44 @@ from uncertainties import unumpy
 from load_data import *
 from plot_data import *
 from background_threshold import *
+from sky_background import *
 from source_detection import *
 from photometry import *
 from logNm import *
 
 # %%
-# Exclude the vertical line and artefacts (e.g. edge effects) from our analysis of the background
-cleanPixels = getCleanPixels()
 
-# Calculate the background threshold
-threshold = getBackgroundThreshold(cleanPixels, Nbins=25).n
+# Calculate the sky background
+# and the threshold above which a pixel is considered a source
+Nx, Ny = 8, 12
+bg, threshold = calculateSkyBg(Nx, Ny)
+
 # %%
-# Load in the image and remove bad sections so we can detect sources
+# Load in the image
 image = getImage()
-image = doManualMasking(image)
 
-image[image < threshold] = np.ma.masked
+image = image - bg # Subtract the background
+image = doManualMasking(image) # Mask bad regions
+image[np.ma.less(image, threshold)] = np.ma.masked # Mask regions below source threshold
+
 # %%
 
 # Run on a small section of the image
+# xmin, xmax = 0, 1000
+# xmin, xmax = 1000, 2000
+# ymin, ymax = 0, 1000
+xmin, xmax = 0, width
+ymin, ymax = 0, height
 
-image = image[0:1000, 0:1000]
-# image = image[1000:2000, 0000:1000]
-# image = image[0:2000, 0000:1000]
+image = image[ymin:ymax, xmin:xmax]
 
 
 # %%
-maskedImage = image.filled(0)
-plotZScale(maskedImage)
+plotZScale(image.data)
+plt.show()
+#%%
+plotMinMax(image.mask)
+plt.show()
 # %%
 
 # Detect sources
@@ -38,14 +48,9 @@ sourceEllipses, apertureSums = detectSources(image)
 
 # %%
 
-plotZScale(image.data)
+plotZScale(originalImage[ymin:ymax, xmin:xmax])
 plotEllipses(sourceEllipses)
-
-# %%
-
-plotZScale(maskedImage)
-plotEllipses(sourceEllipses)
-
+plt.show()
 
 # %%
 # Photometry

@@ -17,6 +17,7 @@ def loadHeader(filePath):
 
 originalImage = loadData(filePath)
 header = loadHeader(filePath)
+height, width = originalImage.shape
 
 
 

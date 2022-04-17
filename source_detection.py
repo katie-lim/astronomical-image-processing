@@ -70,17 +70,24 @@ def detectSources(image, N=-1, debug=False):
             print(ellipse)
 
 
-        # Enlarge the ellipse, to give some "buffer room" and include pixels just outside the ellipse that may be part of the source
-        ellipse = enlargeEllipse(ellipse, 5)
-        ellipsePixels = getEllipsePixels(image, ellipse)
+
+        try:
+            ellipsePixels = getEllipsePixels(image, ellipse)
+
+        except Exception as e:
+            # Sometimes this returns an error
+            # so wrap it in a try/except block
+
+            print("An error occured with the ellipse at (%d, %d):" % (x, y))
+            print(e)
+
+            continue
 
 
-        sourceCnt = getApertureSum(image, ellipsePixels, ellipse, delta=25)
+        sourceCnt = getApertureSum(image, ellipsePixels, ellipse)
 
-
-        if sourceCnt > 0:
-            sourceEllipses.append(ellipse)
-            apertureSums.append(sourceCnt)
+        sourceEllipses.append(ellipse)
+        apertureSums.append(sourceCnt)
 
 
         # Mask the region contained within the ellipse
