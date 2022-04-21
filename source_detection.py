@@ -10,7 +10,7 @@ from photometry import *
 
 
 def detectSources(image, N=-1, debug=False):
-
+    print("Detecting sources.")
     height, width = image.shape
 
     # Pixels in order of brightest to dimmest
@@ -82,6 +82,30 @@ def detectSources(image, N=-1, debug=False):
             print(e)
 
             continue
+
+
+
+        # Check that > 85% of the pixels in the ellipse are source pixels (not bg)
+        ellipseFillFraction = 1 - np.sum(image.mask[ellipsePixels]) / np.sum(ellipsePixels)
+
+        if (ellipseFillFraction < 0.85):
+            # Mask the pixels connected to this source
+            image.mask = np.logical_or(image.mask, cleanData)
+
+            continue
+
+
+        # Plot the detected source
+        # plotZoomedIn(image.mask, x, y, 50, 50, False, show=False)
+        # plotEllipses([ellipse])
+        # plt.show()
+        # print(ellipseFillFraction)
+
+
+
+        # Enlarge the ellipse, to create some "buffer room" and include pixels just outside the ellipse that may be part of the source
+        ellipse = enlargeEllipse(ellipse, 3)
+        ellipsePixels = getEllipsePixels(image, ellipse)
 
 
         sourceCnt = getApertureSum(image, ellipsePixels, ellipse)
