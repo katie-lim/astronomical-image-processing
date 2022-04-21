@@ -28,8 +28,9 @@ def calculateSkyBg(Nx, Ny, Nsigma=5):
     # Plot the blocks
     print("Calculating sky background.")
     plotZScale(image)
-    plt.vlines(blockX, 0, height)
-    plt.hlines(blockY, 0, width)
+    plt.vlines(blockX, 0, height, color="b", linestyles="dashed", lw=1)
+    plt.hlines(blockY, 0, width, color="b", linestyles="dashed", lw=1)
+    # plt.savefig("plots/sky_background_blocks.svg")
     plt.show()
 
 
@@ -97,9 +98,10 @@ def calculateSkyBg(Nx, Ny, Nsigma=5):
     return bg, threshold
 
 # %%
+
 # Nx, Ny = 8, 12
 
-# bg, threshold = calculateSkyBg(image, Nx, Ny)
+# bg, threshold = calculateSkyBg(Nx, Ny)
 
 # # %%
 

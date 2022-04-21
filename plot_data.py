@@ -3,6 +3,13 @@ from matplotlib.patches import Circle, Ellipse
 from astropy.visualization import ImageNormalize, ZScaleInterval
 
 
+# Styling
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.sans-serif'] = "Times New Roman"
+plt.rcParams.update({'font.size': 10})
+
+
+
 def plotZScale(image, cmap="gray"):
 
     norm = ImageNormalize(image, ZScaleInterval())
