@@ -44,7 +44,7 @@ def plotLogNm(magnitudes):
 
 
     plt.figure(dpi=400)
-    plt.errorbar(m, logN, (sigmaLow, sigmaUpp), fmt=".", label="data")
+    plt.errorbar(m, logN, (sigmaLow, sigmaUpp), fmt=".", label="data", color="#4b4bfe", capsize=2)
     plt.xlabel("m")
     plt.ylabel("log N(m)")
     # plt.show()
@@ -76,8 +76,10 @@ def fitLogNm(magnitudes, mCutoff):
 
     plotLogNm(magnitudes)
     # plt.plot(m, f(m, *x0), label="initial guess")
-    plt.plot(m, f(m, *x), label="fit", zorder=100)
+    plt.plot(m, f(m, *x), label="fit", zorder=100, color="k")
+    plt.vlines(mCutoff, -0.2, 3.1, color="#eb0c00", linestyles="dashed", lw=1)
     plt.legend()
+    plt.savefig("plots/logNm.svg")
     plt.show()
 
 

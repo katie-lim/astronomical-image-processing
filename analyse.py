@@ -28,7 +28,9 @@ image[np.ma.less(image, threshold)] = np.ma.masked # Mask regions below source t
 # Run on a small section of the image
 # xmin, xmax = 0, 1000
 # xmin, xmax = 1000, 2000
+# xmin, xmax = 2000, 3000
 # ymin, ymax = 0, 1000
+
 xmin, xmax = 0, width
 ymin, ymax = 0, height
 
@@ -71,7 +73,7 @@ for (ellipse, mag) in zip(sourceEllipses, magnitudes):
 
 # %%
 
-gradient, yintercept = fitLogNm(magnitudes, mCutoff=17)
+gradient, yintercept = fitLogNm(magnitudes, mCutoff=15.5)
 
 # %%
 

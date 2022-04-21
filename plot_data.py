@@ -6,7 +6,7 @@ from astropy.visualization import ImageNormalize, ZScaleInterval
 # Styling
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = "Times New Roman"
-plt.rcParams.update({'font.size': 10})
+plt.rcParams.update({'font.size': 12})
 
 
 
