@@ -64,10 +64,17 @@ def fitLogNm(magnitudes, mCutoff):
 
     # https://stackoverflow.com/questions/19116519/scipy-optimize-curvefit-asymmetric-error-in-fit
 
+    # The function to minimise: sums of squares,
+    # weighted by the error on each data point, sigma
     def loss_function(params):
         error = (logN - f(m, *params))
         error_neg = (error < 0)
+
+        # Use sigmaUpp when the error is positive
+        # and use sigmaLow when the error is negative
+
         error_squared = error**2 / (error_neg * sigmaLow + (1 - error_neg) * sigmaUpp)
+
         return error_squared.sum()
 
 
