@@ -7,11 +7,7 @@ from scipy import interpolate
 
 # %%
 
-def calculateSkyBg(Nx, Ny, Nsigma=5):
-    # Load in the image
-    image = getImage()
-    image = doManualMasking(image)
-
+def calculateSkyBg(image, Nx, Ny, Nsigma=5):
 
     height, width = image.shape
     xSize, ySize = width // Nx, height // Ny
@@ -101,7 +97,7 @@ def calculateSkyBg(Nx, Ny, Nsigma=5):
 
 # Nx, Ny = 8, 12
 
-# bg, threshold = calculateSkyBg(Nx, Ny)
+# bg, threshold = calculateSkyBg(doManualMasking(getImage()), Nx, Ny)
 
 # # %%
 

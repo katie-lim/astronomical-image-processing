@@ -13,7 +13,7 @@ from logNm import *
 # Calculate the sky background
 # and the threshold above which a pixel is considered a source
 Nx, Ny = 8, 12
-bg, threshold = calculateSkyBg(Nx, Ny)
+bg, threshold = calculateSkyBg(doManualMasking(getImage()), Nx, Ny)
 
 # %%
 # Load in the image
@@ -52,6 +52,7 @@ sourceEllipses, apertureSums = detectSources(image)
 
 plotZScale(originalImage[ymin:ymax, xmin:xmax])
 plotEllipses(sourceEllipses)
+plt.savefig("plots/all_sources.svg")
 plt.show()
 
 # %%

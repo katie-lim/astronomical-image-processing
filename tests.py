@@ -4,6 +4,7 @@ from uncertainties import unumpy
 from load_data import *
 from plot_data import *
 from background_threshold import *
+from sky_background import *
 from source_detection import *
 from photometry import *
 
@@ -27,24 +28,23 @@ def generateGaussianSource(height, width, gaussianParams):
 
 
 
-def generateNoiseTestImage(height, width, bg=500, bgSigma=5):
-    data = np.random.normal(bg, bgSigma, (height, width))
+def generateNoiseTestImage(height, width, bgValue, bgSigma):
+    data = np.random.normal(bgValue, bgSigma, (height, width))
 
     return data
 
 
 
-def generateGaussianTestImage(height, width, Nsources, bg=500, bgSigma=5, maxBrightness=5000):
-    data = np.random.normal(bg, bgSigma, (height, width))
+def generateGaussianTestImage(height, width, Nsources, bgValue, bgSigma, sourceSigma, sourceAmplitude=5000):
+    data = np.random.normal(bgValue, bgSigma, (height, width))
 
     for i in range(Nsources):
         x = int(width * np.random.random())
         y = int(height * np.random.random())
 
-
-        sigma = 1/0.258 # 1" source
+        sigma = sourceSigma
         sigmaX, sigmaY = sigma, sigma
-        A = maxBrightness
+        A = sourceAmplitude
 
 
         gaussian = generateGaussianSource(height, width, (x, y, sigmaX, sigmaY, A))
@@ -56,41 +56,76 @@ def generateGaussianTestImage(height, width, Nsources, bg=500, bgSigma=5, maxBri
 
 
 def detectSourcesInTestImage(data):
-    threshold = getBackgroundThreshold(data)
+
+    # Initialise a masked_array containing the image
+    # with no masked regions
+    image = np.ma.masked_array(data, False)
+
+    # Calculate the sky background
+    bg, threshold = calculateSkyBg(image, 6, 6)
+
+    image = image - bg # Subtract the background
+    image[np.ma.less(image, threshold)] = np.ma.masked # Mask regions below source threshold
 
 
-    image = np.ma.masked_array(data, False, fill_value=0)
-    image = maskBackground(image, threshold)
-
-
+    print("Masked image")
     plotMinMax(np.logical_not(image.mask))
+    plt.show()
 
 
     ellipses, apertureSums = detectSources(image)
 
+
+    print("Result")
     plotZScale(image.data)
     plotEllipses(ellipses)
+    plt.show()
 
     return ellipses, apertureSums
 
 
+def calcExpectedFluxCount(sigmaX, sigmaY, A):
+    return 2*np.pi*sigmaX*sigmaY*A
+
 
 
 # %%
 
-data = generateGaussianTestImage(1000, 1000, 80)
+# Noise test image
+
+data = generateNoiseTestImage(1000, 1000, 500, 20)
+ellipses, apertureSums = detectSourcesInTestImage(data)
+
+# %%
+
+# Gaussian test image
+
+fwhm = 1/0.258 # 1" source
+sigma = fwhm/2.355 # Convert FWHM to Gaussian sigma
+A = 5000 # Source amplitude
+
+data = generateGaussianTestImage(1000, 1000, 80, 500, 20, sigma, A)
 ellipses, apertureSums = detectSourcesInTestImage(data)
 
 
-# Calculate magnitudes from the pixel sums
-magnitudes = calcMagnitudes(apertureSums)
+# Compute expected magnitude
+expectedFluxCount = calcExpectedFluxCount(sigma, sigma, A)
+expectedMagnitude = calcMagnitudes([expectedFluxCount])
+print("Expected magnitude:", expectedMagnitude)
 
+
+# Calculate magnitudes from the pixel sums
+aperSumsWithErr = unumpy.uarray(apertureSums, np.sqrt(apertureSums))
+magnitudes = calcMagnitudes(aperSumsWithErr)
+
+print("Actual measured magnitudes:")
 print(magnitudes)
 
 # %%
 
-data = generateNoiseTestImage(1000, 1000)
+# All 0s test image
+
+data = np.zeros((1000, 1000))
 ellipses, apertureSums = detectSourcesInTestImage(data)
 
 # %%
-
