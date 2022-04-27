@@ -9,7 +9,7 @@ from ellipses import *
 from photometry import *
 
 
-def detectSources(image, N=-1, debug=False):
+def detectSources(image, N=-1, debug=False, ellipseFillThreshold=0.85):
     print("Detecting sources.")
     height, width = image.shape
 
@@ -38,7 +38,7 @@ def detectSources(image, N=-1, debug=False):
 
         # Check whether this pixel lies near an edge
         # If so, skip this pixel to avoid errors from edge effects
-        edgeThreshold = 50
+        edgeThreshold = 20
 
         if (x < edgeThreshold) or (x > width - edgeThreshold) or (y < edgeThreshold) or (y > height - edgeThreshold):
             if debug:
@@ -88,7 +88,7 @@ def detectSources(image, N=-1, debug=False):
         # Check that > 85% of the pixels in the ellipse are source pixels (not bg)
         ellipseFillFraction = 1 - np.sum(image.mask[ellipsePixels]) / np.sum(ellipsePixels)
 
-        if (ellipseFillFraction < 0.85):
+        if (ellipseFillFraction < ellipseFillThreshold):
             # Mask the pixels connected to this source
             image.mask = np.logical_or(image.mask, cleanData)
 

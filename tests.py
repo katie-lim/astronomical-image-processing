@@ -1,6 +1,5 @@
 # %%
 import numpy as np
-from uncertainties import unumpy
 from load_data import *
 from plot_data import *
 from background_threshold import *
@@ -55,7 +54,7 @@ def generateGaussianTestImage(height, width, Nsources, bgValue, bgSigma, sourceS
     return data
 
 
-def detectSourcesInTestImage(data):
+def detectSourcesInTestImage(data, ellipseFillThreshold=0.85):
 
     # Initialise a masked_array containing the image
     # with no masked regions
@@ -73,7 +72,7 @@ def detectSourcesInTestImage(data):
     plt.show()
 
 
-    ellipses, fluxCounts = detectSources(image)
+    ellipses, fluxCounts = detectSources(image, ellipseFillThreshold=ellipseFillThreshold)
 
 
     print("Result")
@@ -104,8 +103,9 @@ fwhm = 1/0.258 # 1" source
 sigma = fwhm/2.355 # Convert FWHM to Gaussian sigma
 A = 5000 # Source amplitude
 
-data = generateGaussianTestImage(1000, 1000, 80, 500, 20, sigma, A)
-ellipses, fluxCounts = detectSourcesInTestImage(data)
+data = generateGaussianTestImage(1000, 1000, 100, 500, 20, sigma, A)
+
+ellipses, fluxCounts = detectSourcesInTestImage(data, ellipseFillThreshold=0.9)
 
 
 # Compute expected magnitude

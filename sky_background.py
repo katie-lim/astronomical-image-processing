@@ -31,10 +31,11 @@ def calculateSkyBg(image, Nx, Ny, Nsigma=5):
 
 
     # Calculate the background value in each block
-    while (y < height):
+    while (y <= height):
         x = xSize
 
-        while (x < width):
+        while (x <= width):
+
             block = image[y - ySize//2:y + ySize//2, x - xSize//2:x + xSize//2]
 
 
