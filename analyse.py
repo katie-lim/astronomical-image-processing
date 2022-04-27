@@ -76,6 +76,7 @@ for (ellipse, mag) in zip(sourceEllipses, magnitudes):
 
 gradient, yintercept = fitLogNm(magnitudes, mCutoff=15.5)
 
+# daofind(image, 5)
 # %%
 
 # sourceEllipses, aperSumsWithErr, magnitudes = loadCatalogue()

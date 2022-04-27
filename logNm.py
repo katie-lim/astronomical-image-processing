@@ -3,7 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import fmin
 from uncertainties import unumpy
-
+from astropy.table import Table
+from astropy.stats import sigma_clipped_stats
+from photutils.datasets import load_star_image
+from photutils.detection import DAOStarFinder
 
 def getLogNmValues(magnitudes, mCutoff=None):
     mags = unumpy.nominal_values(magnitudes)
@@ -84,4 +87,26 @@ def fitLogNm(magnitudes, mCutoff):
 
 
     return x
+
+def daoFind(cleanimage, Nsigma):
+    #output the number count plot using Photutils
+    data = cleanimage.data
+    
+    mean, median, std = sigma_clipped_stats(data)  
+    
+    daofind = DAOStarFinder(fwhm=1.0, threshold = Nsigma * std)  
+    
+    sources = daofind(data - Nsigma * std)
+    
+    for col in sources.colnames:  
+        
+        sources[col].info.format = '%.8g'  
+    
+    # print(sources) 
+    
+    magn = sources['mag']
+
+    gradient, yintercept = fitLogNm(magn, mCutoff=None)
+
+    
 # %%
