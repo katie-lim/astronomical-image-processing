@@ -18,7 +18,7 @@ def detectSources(image, N=-1, debug=False):
 
 
     sourceEllipses = []
-    apertureSums = []
+    fluxCounts = []
 
 
     for index in pixelIndices:
@@ -108,19 +108,19 @@ def detectSources(image, N=-1, debug=False):
         ellipsePixels = getEllipsePixels(image, ellipse)
 
 
-        sourceCnt = getApertureSum(image, ellipsePixels, ellipse)
+        sourceCnt = getfluxCount(image, ellipsePixels, ellipse)
 
         sourceEllipses.append(ellipse)
-        apertureSums.append(sourceCnt)
+        fluxCounts.append(sourceCnt)
 
 
         # Mask the region contained within the ellipse
         image.mask = np.logical_or(image.mask, ellipsePixels)
 
 
-    apertureSums = np.array(apertureSums)
+    fluxCounts = np.array(fluxCounts)
 
-    return sourceEllipses, apertureSums
+    return sourceEllipses, fluxCounts
 
 
 

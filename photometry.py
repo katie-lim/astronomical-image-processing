@@ -7,7 +7,7 @@ from plot_data import *
 from ellipses import *
 
 
-def getApertureSum(image, sourcePixels, ellipse, plot=False):
+def getfluxCount(image, sourcePixels, ellipse, plot=False):
 
     # Find the sum of counts
     sourceCnt = np.sum(image.data[sourcePixels])
@@ -26,10 +26,13 @@ def getApertureSum(image, sourcePixels, ellipse, plot=False):
     return sourceCnt
 
 
-def calcMagnitudes(aperSumsWithErr):
-    zeroPt = ufloat(header["MAGZPT"], header["MAGZRR"])
+def calcMagnitudes(fluxCounts):
 
-    magnitudes = zeroPt - 2.5*unumpy.log10(aperSumsWithErr)
+    # Add errors to the flux counts
+    fluxCountsWithErr = unumpy.uarray(fluxCounts, np.sqrt(fluxCounts))
+
+    zeroPt = ufloat(header["MAGZPT"], header["MAGZRR"])
+    magnitudes = zeroPt - 2.5*unumpy.log10(fluxCountsWithErr)
 
     return magnitudes
 

@@ -73,7 +73,7 @@ def detectSourcesInTestImage(data):
     plt.show()
 
 
-    ellipses, apertureSums = detectSources(image)
+    ellipses, fluxCounts = detectSources(image)
 
 
     print("Result")
@@ -81,7 +81,7 @@ def detectSourcesInTestImage(data):
     plotEllipses(ellipses)
     plt.show()
 
-    return ellipses, apertureSums
+    return ellipses, fluxCounts
 
 
 def calcExpectedFluxCount(sigmaX, sigmaY, A):
@@ -94,7 +94,7 @@ def calcExpectedFluxCount(sigmaX, sigmaY, A):
 # Noise test image
 
 data = generateNoiseTestImage(1000, 1000, 500, 20)
-ellipses, apertureSums = detectSourcesInTestImage(data)
+ellipses, fluxCounts = detectSourcesInTestImage(data)
 
 # %%
 
@@ -105,7 +105,7 @@ sigma = fwhm/2.355 # Convert FWHM to Gaussian sigma
 A = 5000 # Source amplitude
 
 data = generateGaussianTestImage(1000, 1000, 80, 500, 20, sigma, A)
-ellipses, apertureSums = detectSourcesInTestImage(data)
+ellipses, fluxCounts = detectSourcesInTestImage(data)
 
 
 # Compute expected magnitude
@@ -115,8 +115,7 @@ print("Expected magnitude:", expectedMagnitude)
 
 
 # Calculate magnitudes from the pixel sums
-aperSumsWithErr = unumpy.uarray(apertureSums, np.sqrt(apertureSums))
-magnitudes = calcMagnitudes(aperSumsWithErr)
+magnitudes = calcMagnitudes(fluxCounts)
 
 print("Actual measured magnitudes:")
 print(magnitudes)
@@ -126,6 +125,6 @@ print(magnitudes)
 # All 0s test image
 
 data = np.zeros((1000, 1000))
-ellipses, apertureSums = detectSourcesInTestImage(data)
+ellipses, fluxCounts = detectSourcesInTestImage(data)
 
 # %%

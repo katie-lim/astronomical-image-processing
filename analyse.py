@@ -46,7 +46,7 @@ plt.show()
 # %%
 
 # Detect sources
-sourceEllipses, apertureSums = detectSources(image)
+sourceEllipses, fluxCounts = detectSources(image)
 
 # %%
 
@@ -57,11 +57,9 @@ plt.show()
 
 # %%
 # Photometry
-# Add errors to the counts
-aperSumsWithErr = unumpy.uarray(apertureSums, np.sqrt(apertureSums))
 
 # Calculate magnitudes from the pixel sums
-magnitudes = calcMagnitudes(apertureSums)
+magnitudes = calcMagnitudes(fluxCounts)
 
 
 # %%
@@ -79,7 +77,8 @@ gradient, yintercept = fitLogNm(magnitudes, mCutoff=15.5)
 # daofind(image, 5)
 # %%
 
-# sourceEllipses, aperSumsWithErr, magnitudes = loadCatalogue()
-saveCatalogue(sourceEllipses, aperSumsWithErr, magnitudes)
+# sourceEllipses, fluxCountsWithErr, magnitudes = loadCatalogue()
+
+saveCatalogue(sourceEllipses, fluxCounts, magnitudes)
 
 # %%

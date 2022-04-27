@@ -102,18 +102,21 @@ def doManualMasking(image):
 
 
 
-def saveCatalogue(ellipses, apertureSums, magnitudes):
+def saveCatalogue(ellipses, fluxCounts, magnitudes):
+    # Ellipses
     xy, axLengths, angles = list(zip(*ellipses))
     x, y = list(zip(*xy))
     majorAxLengths, minorAxLengths = list(zip(*axLengths))
 
-    aperSums = unumpy.nominal_values(apertureSums)
-    aperSumsErrs = unumpy.std_devs(apertureSums)
+    # Photometry
+    fluxCountsErrs = np.sqrt(fluxCounts)
 
     mags = unumpy.nominal_values(magnitudes)
     magsErrs = unumpy.std_devs(magnitudes)
 
-    df = pd.DataFrame({"x": x, "y": y, "majoraxislength": majorAxLengths, "minoraxislength": minorAxLengths, "angle": angles, "count": aperSums, "counterr": aperSumsErrs, "magnitude": mags, "magnitudeerr": magsErrs})
+
+    # Save results in a csv
+    df = pd.DataFrame({"x": x, "y": y, "majoraxislength": majorAxLengths, "minoraxislength": minorAxLengths, "angle": angles, "count": fluxCounts, "counterr": fluxCountsErrs, "magnitude": mags, "magnitudeerr": magsErrs})
 
     df.to_csv("catalogue.csv")
 
@@ -123,7 +126,7 @@ def loadCatalogue():
     df = pd.read_csv("catalogue.csv", index_col=0)
 
 
-    x, y, majorAxLengths, minorAxLengths, angles, aperSums, aperSumsErrs, mags, magsErrs = df.to_numpy().T
+    x, y, majorAxLengths, minorAxLengths, angles, fluxCounts, fluxCountsErrs, mags, magsErrs = df.to_numpy().T
 
     ellipses = []
 
@@ -131,11 +134,11 @@ def loadCatalogue():
         ellipse = ((x[i], y[i]), (majorAxLengths[i], minorAxLengths[i]), angles[i])
         ellipses.append(ellipse)
 
-    aperSumsWithErrs = unumpy.uarray(aperSums, aperSumsErrs)
+    fluxCountsWithErrs = unumpy.uarray(fluxCounts, fluxCountsErrs)
     magnitudes = unumpy.uarray(mags, magsErrs)
 
 
-    return ellipses, aperSumsWithErrs, magnitudes
+    return ellipses, fluxCountsWithErrs, magnitudes
 
 
 # %%
