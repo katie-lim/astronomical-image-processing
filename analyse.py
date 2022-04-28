@@ -72,7 +72,10 @@ for (ellipse, mag) in zip(sourceEllipses, magnitudes):
 
 # %%
 
-gradient, yintercept = fitLogNm(magnitudes, mCutoff=15.5)
+print("Fitting log N(m).")
+fitLogNm(magnitudes, mCutoff=15.5)
+print("Aymmetric fit:")
+fitLogNmAsym(magnitudes, mCutoff=15.5)
 
 # daofind(image, 5)
 # %%
